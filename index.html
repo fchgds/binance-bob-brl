@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binance P2P rates</title>
+</head>
+<body>
+    <h2>BOB to USDT</h2>
+    <p id="price1"></p>
+
+    <h2>USD to BRL</h2>
+    <p id="price2"></p>
+
+    <h2>BOB to BRL</h2>
+    <p id="price3"></p>
+    <script>
+    let data;
+    let bobusdt;
+    let usdtbrl;
+
+    fetch("https://criptoya.com/api/binancep2p/USDT/BOB/100")
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        document.getElementById("price1").innerHTML = data.ask;
+        bobusdt= data.ask
+    });
+
+    fetch("https://criptoya.com/api/binancep2p/USDT/BRL/100")
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        document.getElementById("price2").innerHTML = data.bid;
+        usdtbrl= data.bid
+        document.getElementById("price3").innerHTML = (bobusdt/usdtbrl).toFixed(2);
+    });
+    </script>
+</body>
+</html>
