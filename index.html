@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Binance P2P rates</title>
-</head>
-<body>
+  </head>
+  <body>
     <h2>BOB to USDT</h2>
     <p id="price1"></p>
 
@@ -15,26 +15,32 @@
     <h2>BOB to BRL</h2>
     <p id="price3"></p>
     <script>
-    let data;
-    let bobusdt;
-    let usdtbrl;
+      let bobusdt;
+      let usdtbrl;
 
-    fetch("https://criptoya.com/api/binancep2p/USDT/BOB/100")
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-        document.getElementById("price1").innerHTML = data.ask;
-        bobusdt= data.ask
-    });
+      Promise.all([
+        fetch("https://criptoya.com/api/binancep2p/USDT/BOB/100").then(
+          (response) => response.json()
+        ),
+        fetch("https://criptoya.com/api/binancep2p/USDT/BRL/100").then(
+          (response) => response.json()
+        ),
+      ])
+        .then((data) => {
+          bobusdt = data[0].ask;
+          document.getElementById("price1").innerHTML = bobusdt;
 
-    fetch("https://criptoya.com/api/binancep2p/USDT/BRL/100")
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-        document.getElementById("price2").innerHTML = data.bid;
-        usdtbrl= data.bid
-        document.getElementById("price3").innerHTML = (bobusdt/usdtbrl).toFixed(2);
-    });
+          usdtbrl = data[1].bid;
+          document.getElementById("price2").innerHTML = usdtbrl;
+
+          document.getElementById("price3").innerHTML = (
+            bobusdt / usdtbrl
+          ).toFixed(2);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+          // Handle the error appropriately, e.g., display an error message to the user
+        });
     </script>
-</body>
+  </body>
 </html>
