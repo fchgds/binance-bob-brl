@@ -73,7 +73,7 @@
 
 
           usdteur = 0.95
-          eurusdt = 0.96;
+          eurusdt = 1.052;
 
           document.getElementById("bobusdt").innerHTML = bobusdt;
           document.getElementById("usdtbob").innerHTML = usdtbob;
@@ -90,7 +90,7 @@
                   bobusdt / usdteur
           ).toFixed(2);
           document.getElementById("brlbob").innerHTML = (
-                  brlusdt / usdtbob
+                  1 / brlusdt * usdtbob
           ).toFixed(2);
 
           document.getElementById("brleur").innerHTML = (
@@ -98,10 +98,10 @@
           ).toFixed(2);
 
           document.getElementById("eurbob").innerHTML = (
-                  eurusdt / usdtbob
+                  1 / eurusdt * usdtbob
           ).toFixed(2);
           document.getElementById("eurbrl").innerHTML = (
-                  eurusdt / usdtbrl
+                  1 / eurusdt * usdtbrl
           ).toFixed(2);
 
 
