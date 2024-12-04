@@ -59,9 +59,9 @@
         fetch("https://criptoya.com/api/binancep2p/USDT/BRL/100").then(
           (response) => response.json()
         ),
-        fetch("https://criptoya.com/api/binancep2p/USDT/EUR/100").then(
-                (response) => response.json()
-        ),
+        // fetch("https://criptoya.com/api/binancep2p/USDT/EUR/100").then(
+        //         (response) => response.json()
+        // ),
       ])
         .then((data) => {
           bobusdt = data[0].ask;
@@ -72,8 +72,8 @@
           usdtbrl = data[1].bid;
 
 
-          usdteur = data[2].bid;
-          eurusdt = data[2].ask;
+          usdteur = 0.95
+          eurusdt = 0.96;
 
           document.getElementById("bobusdt").innerHTML = bobusdt;
           document.getElementById("usdtbob").innerHTML = usdtbob;
