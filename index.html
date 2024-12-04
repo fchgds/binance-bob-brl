@@ -6,17 +6,51 @@
     <title>Binance P2P rates</title>
   </head>
   <body>
-    <h2>BOB to USDT</h2>
-    <p id="price1"></p>
-
-    <h2>USD to BRL</h2>
-    <p id="price2"></p>
-
-    <h2>BOB to BRL</h2>
-    <p id="price3"></p>
+<table>
+  <thead>
+    <tr>
+      <th></th>
+      <th>BOB</th>
+      <th>USDT</th>
+      <th>BRL</th>
+      <th>EUR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>BOB</td>
+      <td>1</td>
+      <td id="bobusdt"></td>
+      <td id="bobbrl"></td>
+      <td id="bobeur"></td>
+    </tr>
+    <tr>
+      <td>USDT</td>
+      <td id="usdtbob"></td>
+      <td>1</td>
+      <td id="usdtbrl"></td>
+      <td id="usdteur"></td>
+    </tr>
+    <tr>
+      <td>BRL</td>
+      <td id="brlbob"></td>
+      <td id="brlusdt"></td>
+      <td>1</td>
+      <td id="brleur"></td>
+    </tr>
+    <tr>
+      <td>EUR</td>
+      <td id="eurbob"></td>
+      <td id="eurusdt"></td>
+      <td id="eurbrl"></td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
     <script>
       let bobusdt;
       let usdtbrl;
+      let usdteur;
 
       Promise.all([
         fetch("https://criptoya.com/api/binancep2p/USDT/BOB/100").then(
@@ -25,17 +59,52 @@
         fetch("https://criptoya.com/api/binancep2p/USDT/BRL/100").then(
           (response) => response.json()
         ),
+        fetch("https://criptoya.com/api/binancep2p/USDT/EUR/100").then(
+                (response) => response.json()
+        ),
       ])
         .then((data) => {
           bobusdt = data[0].ask;
-          document.getElementById("price1").innerHTML = bobusdt;
+          usdtbob = data[0].bid;
 
+
+          brlusdt = data[1].ask;
           usdtbrl = data[1].bid;
-          document.getElementById("price2").innerHTML = usdtbrl;
 
-          document.getElementById("price3").innerHTML = (
+
+          usdteur = data[2].bid;
+          eurusdt = data[2].ask;
+
+          document.getElementById("bobusdt").innerHTML = bobusdt;
+          document.getElementById("usdtbob").innerHTML = usdtbob;
+          document.getElementById("brlusdt").innerHTML = brlusdt;
+          document.getElementById("usdtbrl").innerHTML = usdtbrl;
+          document.getElementById("usdteur").innerHTML = usdteur;
+          document.getElementById("eurusdt").innerHTML = eurusdt;
+
+
+          document.getElementById("bobbrl").innerHTML = (
             bobusdt / usdtbrl
           ).toFixed(2);
+          document.getElementById("bobeur").innerHTML = (
+                  bobusdt / usdteur
+          ).toFixed(2);
+          document.getElementById("brlbob").innerHTML = (
+                  brlusdt / usdtbob
+          ).toFixed(2);
+
+          document.getElementById("brleur").innerHTML = (
+                  brlusdt / usdteur
+          ).toFixed(2);
+
+          document.getElementById("eurbob").innerHTML = (
+                  eurusdt / usdtbob
+          ).toFixed(2);
+          document.getElementById("eurbrl").innerHTML = (
+                  eurusdt / usdtbrl
+          ).toFixed(2);
+
+
         })
         .catch((error) => {
           console.error("Error fetching data:", error);
