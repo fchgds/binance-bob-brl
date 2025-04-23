@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Binance P2P rates</title>
+    <title>P2P Currency Exchange - Tipos de Cambios P2P</title>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -106,85 +106,142 @@
     </table>
 
     <div class="controls">
-      <select id="fromCurrency">
-        <option value="BOB">BOB</option>
-        <option value="USDT">USDT</option>
-        <option value="BRL">BRL</option>
-        <option value="EUR">EUR</option>
-      </select>
-      <select id="toCurrency">
-        <option value="BOB">BOB</option>
-        <option value="USDT">USDT</option>
-        <option value="BRL">BRL</option>
-        <option value="EUR">EUR</option>
-      </select>
+      <div>
+        <select id="fromCurrency">
+          <option value="BOB">BOB</option>
+          <option value="USDT">USDT</option>
+          <option value="BRL">BRL</option>
+          <option value="EUR">EUR</option>
+        </select>
+        <input type="number" id="fromValue" value="1" min="0" />
+      </div>
+      <div>
+        <select id="toCurrency">
+          <option value="BOB">BOB</option>
+          <option value="USDT">USDT</option>
+          <option value="BRL">BRL</option>
+          <option value="EUR">EUR</option>
+        </select>
+        <input type="number" id="toValue" value="0" min="0" />
+      </div>
       <button id="switchButton">Switch Currencies</button>
     </div>
 
     <script>
-      let bobusdt;
-      let usdtbrl;
-      let usdteur;
+      let exchangeRates = {
+        BOB: { USDT: 0, BRL: 0, EUR: 0, BOB: 1 },
+        USDT: { BOB: 0, BRL: 0, EUR: 0, USDT: 1 },
+        BRL: { BOB: 0, USDT: 0, EUR: 0, BRL: 1 },
+        EUR: { BOB: 0, USDT: 0, BRL: 0, EUR: 1 },
+      };
 
+      // Fetch exchange rates
       Promise.all([
-        fetch("https://criptoya.com/api/binancep2p/USDT/BOB/100").then(
-          (response) => response.json()
+        fetch("https://criptoya.com/api/binancep2p/USDT/BOB/100").then((res) =>
+          res.json()
         ),
-        fetch("https://criptoya.com/api/binancep2p/USDT/BRL/100").then(
-          (response) => response.json()
+        fetch("https://criptoya.com/api/binancep2p/USDT/BRL/100").then((res) =>
+          res.json()
+        ),
+        fetch("https://api.coinbase.com/v2/exchange-rates?currency=EUR").then(
+          (res) => res.json()
         ),
       ])
         .then((data) => {
-          bobusdt = data[0].ask;
-          usdtbob = data[0].bid;
+          // Assign fetched data to exchangeRates
+          exchangeRates.BOB.USDT = data[0].ask;
+          exchangeRates.USDT.BOB = data[0].bid;
 
-          brlusdt = data[1].ask;
-          usdtbrl = data[1].bid;
+          exchangeRates.BRL.USDT = data[1].ask;
+          exchangeRates.USDT.BRL = data[1].bid;
 
-          usdteur = 0.95;
-          eurusdt = 1.052;
+          // Process Coinbase API data for EUR
+          const coinbaseRates = data[2].data.rates;
+          exchangeRates.USDT.EUR = parseFloat(coinbaseRates.USDT).toFixed(2);
+          exchangeRates.EUR.USDT = exchangeRates.USDT.EUR;
 
-          document.getElementById("bobusdt").innerHTML = bobusdt;
-          document.getElementById("usdtbob").innerHTML = usdtbob;
-          document.getElementById("brlusdt").innerHTML = brlusdt;
-          document.getElementById("usdtbrl").innerHTML = usdtbrl;
-          document.getElementById("usdteur").innerHTML = usdteur;
-          document.getElementById("eurusdt").innerHTML = eurusdt;
-
-          document.getElementById("bobbrl").innerHTML = (
-            bobusdt / usdtbrl
+          exchangeRates.BOB.BRL = (
+            exchangeRates.BOB.USDT / exchangeRates.USDT.BRL
           ).toFixed(2);
-          document.getElementById("bobeur").innerHTML = (
-            bobusdt / usdteur
+          exchangeRates.BOB.EUR = (
+            exchangeRates.BOB.USDT / exchangeRates.USDT.EUR
           ).toFixed(2);
-          document.getElementById("brlbob").innerHTML = (
-            (1 / brlusdt) * usdtbob
+          exchangeRates.BRL.BOB = (
+            (1 / exchangeRates.BRL.USDT) * exchangeRates.USDT.BOB
           ).toFixed(2);
-
-          document.getElementById("brleur").innerHTML = (
-            brlusdt / usdteur
+          exchangeRates.BRL.EUR = (
+            exchangeRates.BRL.USDT / exchangeRates.USDT.EUR
+          ).toFixed(2);
+          exchangeRates.EUR.BOB = (
+            (1 / exchangeRates.EUR.USDT) * exchangeRates.USDT.BOB
+          ).toFixed(2);
+          exchangeRates.EUR.BRL = (
+            (1 / exchangeRates.EUR.USDT) * exchangeRates.USDT.BRL
           ).toFixed(2);
 
-          document.getElementById("eurbob").innerHTML = (
-            (1 / eurusdt) * usdtbob
-          ).toFixed(2);
-          document.getElementById("eurbrl").innerHTML = (
-            (1 / eurusdt) * usdtbrl
-          ).toFixed(2);
+          // Update table cells with fetched data
+          document.getElementById("bobusdt").textContent = exchangeRates.BOB.USDT;
+          document.getElementById("bobbrl").textContent = exchangeRates.BOB.BRL;
+          document.getElementById("bobeur").textContent = exchangeRates.BOB.EUR;
+
+          document.getElementById("usdtbob").textContent = exchangeRates.USDT.BOB;
+          document.getElementById("usdtbrl").textContent = exchangeRates.USDT.BRL;
+          document.getElementById("usdteur").textContent = exchangeRates.USDT.EUR;
+
+          document.getElementById("brlbob").textContent = exchangeRates.BRL.BOB;
+          document.getElementById("brlusdt").textContent = exchangeRates.BRL.USDT;
+          document.getElementById("brleur").textContent = exchangeRates.BRL.EUR;
+
+          document.getElementById("eurbob").textContent = exchangeRates.EUR.BOB;
+          document.getElementById("eurusdt").textContent = exchangeRates.EUR.USDT;
+          document.getElementById("eurbrl").textContent = exchangeRates.EUR.BRL;
         })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-        });
+        .catch((error) => console.error("Error fetching data:", error));
 
-      const switchButton = document.getElementById("switchButton");
       const fromCurrency = document.getElementById("fromCurrency");
       const toCurrency = document.getElementById("toCurrency");
+      const fromValue = document.getElementById("fromValue");
+      const toValue = document.getElementById("toValue");
+      const switchButton = document.getElementById("switchButton");
 
+      // Update the toValue when fromValue changes
+      fromValue.addEventListener("input", () => {
+        const from = fromCurrency.value;
+        const to = toCurrency.value;
+        const rate = exchangeRates[from][to];
+        toValue.value = (fromValue.value * rate).toFixed(2);
+      });
+
+      // Update the fromValue when toValue changes
+      toValue.addEventListener("input", () => {
+        const from = fromCurrency.value;
+        const to = toCurrency.value;
+        const rate = exchangeRates[to][from];
+        fromValue.value = (toValue.value * rate).toFixed(2);
+      });
+
+      // Update the conversion when currencies change
+      fromCurrency.addEventListener("change", () => {
+        fromValue.dispatchEvent(new Event("input"));
+      });
+
+      toCurrency.addEventListener("change", () => {
+        fromValue.dispatchEvent(new Event("input"));
+      });
+
+      // Switch currencies
       switchButton.addEventListener("click", () => {
-        const temp = fromCurrency.value;
+        const tempCurrency = fromCurrency.value;
         fromCurrency.value = toCurrency.value;
-        toCurrency.value = temp;
+        toCurrency.value = tempCurrency;
+
+        const tempValue = fromValue.value;
+        fromValue.value = toValue.value;
+        toValue.value = tempValue;
       });
     </script>
+    <footer style="margin-top: 20px; font-size: 14px; color: #555;">
+      <p>Powered by <a href="https://zoftco.com" target="_blank">Zoftco</a></p>
+    </footer>
   </body>
 </html>
